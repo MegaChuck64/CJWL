@@ -2,93 +2,138 @@
 
 public class CJApp
 {
-    public string Name { get; set; }
-    
+    public Dictionary<string, CJClass> Classes { get; set; }
+    public CJMethod Entry { get; set; }
 
 }
 
-public class CJClass : CJScope
+public class CJClass
 {
-    public string Name { get; set; }
-    public List<CJVariable> ConstructorParams { get; set; }
-    public List<CJStatement> ConstructorStatements { get; set; }
-    
+    public Dictionary<string, string> Properties { get; set; }
+    public Dictionary<string, CJMethod> Methods { get; set; }
 }
 
-public class CJMethod : CJScope
+public class CJMethod
 {
-    public string Name { get; set; }
-    public List<CJVariable> Params { get; set; }
+    public Dictionary<string, string> Parameters { get; set; }
     public List<CJStatement> Statements { get; set; }
+    public Dictionary<string, object> LocalVariables { get; set; }
 }
 
-public abstract class CJStatement
+
+public class CJStatement
 {
-    public CJStatementType Type { get; private set; }    
-    
-    public string Data { get; private set; }
+    public StatementType Type { get; set; }
+    public string Code { get; set; }
 
-    public CJStatement(CJStatementType type, string data)
+    public CJStatement(string code)
     {
-        Type = type;
-        Data = data;
-    }    
-}
-
-public class CJAssignmentStatement : CJStatement
-{
-
-    public List<CJVariable> TargetReferences { get; private set; }
-    public CJVariable ValueHolder { get; private set; }
-    public CJAssignmentStatement(string data) : base(CJStatementType.Assignment, data)
-    {
-        var splt = data.Split('=');
-        if (splt.Length < 2)
-            throw new Exception("improperly formated assignment statement");
-
-        TargetReferences = new List<CJVariable>();
-
-        ValueHolder = new CJVariable
+        Code = code;
+        var split = Code.Trim().Split(' ');
+        Type = split[0] switch
         {
-            Name = splt[^1].Trim(),            
+            "app" => StatementType.AppDeclaration,
+            "entry" => StatementType.EntryDeclaration,
+            "class" => StatementType.ClassDeclaration,
+            "void" => StatementType.MethodDeclaration,
+            "if" => StatementType.IfDeclaration,
+            "elif" => StatementType.ElifDeclaration,
+            "else" => StatementType.ElseDeclaration,
+            "foreach" => StatementType.ForeachDeclaration,
+            "while" => StatementType.WhileDeclaration,
+            _ when split[^1].EndsWith(":") => StatementType.MethodCall,
+            _ when split[^1].EndsWith(")") => StatementType.MethodCall,
+            _ => StatementType.FieldDeclaration
         };
+
     }
+    public object Execute()
+    {
+        string[] split;
+        switch (Type)
+        {
+            case StatementType.AppDeclaration:
+                return Code.Split(new char[] { ' ', ':' })[1];
+            case StatementType.EntryDeclaration:
+                split = Code.Split(new char[] { ' ', ':', ',', '(', ')' });
+                var entryArgs = new Dictionary<string, string>();
+                for (int i = 1; i < split.Length; i+=2)
+                {
+                    var typ = split[i];
+                    var nam = split[i + 1];
+
+                    entryArgs.Add(nam, typ);
+                }
+                return entryArgs;
+            case StatementType.ClassDeclaration:
+                split = Code.Split(new char[] { ' ', ':', '(', ')', ',' });
+                var className = split[0];
+                var classObj = new CJClass();
+                var props = new Dictionary<string, string>();
+                for (int i = 1; i < split.Length; i += 2)
+                {
+                    var typ = split[i];
+                    var nam = split[i + 1];
+                    props.Add(nam, typ);
+                }
+                classObj.Methods = new Dictionary<string, CJMethod>();
+                classObj.Properties = props;
+                return (className, classObj);
+
+            case StatementType.FieldDeclaration:
+
+                return Code;
+
+            case StatementType.MethodDeclaration:
+                split = Code.Split(new char[] { ' ', ':', '(', ')' });
+                var returnType = split[0];
+                var name = split[1];
+                var method = new CJMethod()
+                {
+                    LocalVariables = new Dictionary<string, object>(),
+                    Statements = new List<CJStatement>(),
+                };
+                var parms = new Dictionary<string, string>();
+                for (int i = 2; i < split.Length; i+=2)
+                {
+                    var typ = split[i];
+                    var nam = split[i + 1];
+                    parms.Add(nam, typ);
+                }
+
+                method.Parameters = parms;
+                return (name, returnType, method);
+                
+            //case StatementType.MethodCall:
+            //    break;
+            //case StatementType.ForeachDeclaration:
+            //    break;
+            //case StatementType.IfDeclaration:
+            //    break;
+            //case StatementType.ElifDeclaration:
+            //    break;
+            //case StatementType.ElseDeclaration:
+            //    break;
+            default:
+                return Code;
+        }
+    }
+
+    
 }
 
-public abstract class CJScope
-{
-    public List<CJVariable> Variables { get; set; }
-    public List<CJMethod> Methods { get; set; }
-}
 
-
-public enum CJStatementType
+public enum StatementType
 {
-    Assignment,
-    If,
-    While,
-    For,
-    Return,
-    Break,
-    Continue,
-    Expression,
-    Block
-}
-
-public class CJVariable
-{
-    public CJType Type { get; set; }
-    public string Name { get; set; }
-    public string Value { get; set; }
-}
-
-public enum CJType
-{
-    String,
-    Integer,
-    Float,
-    Boolean,
-    Object,
-    Array,
-    Null
+    AppDeclaration,
+    EntryDeclaration,
+    ClassDeclaration,
+    FieldDeclaration,
+    MethodDeclaration,
+    MethodCall,
+    ForeachDeclaration,
+    IfDeclaration,
+    ElifDeclaration,
+    ElseDeclaration,
+    WhileDeclaration,
 }
