@@ -19,8 +19,8 @@ int lineCount = 0;
 int scope = 0;
 //list index is scope level,
 //dict key is variable name,
-//dict value is variable value
-var variables = new List<Dictionary<string, object>>();
+//dict value is variable value 
+var variables = new List<Dictionary<string, object?>>();
 bool appCreated = false;
 
 var res = EvaluateExpression(new string[] { "1", "+", "2", "-", "2", "+", "5" });
@@ -34,7 +34,7 @@ foreach (var line in lines)
         {
             appCreated = true;
             scope++;
-            variables.Add(new Dictionary<string, object>());
+            variables.Add(new Dictionary<string, object?>());
         }
     }
     else
@@ -52,38 +52,15 @@ foreach (var line in lines)
                     if (expressionTokens.Length == 0)
                         throw new CJException("No expression specified after '='.", lineCount);
 
-                    if (expressionTokens.Length == 1)
-                    {
-                        var value = expressionTokens[0];
-                        if (value.StartsWith("\"") && value.EndsWith("\""))
-                        {
-                            variables[scope].Add(name, value.Substring(1, value.Length - 2));
-                        }
-                        else if (int.TryParse(value, out var intValue))
-                        {
-                            variables[scope].Add(name, intValue);
-                        }
-                        else if (float.TryParse(value, out var floatValue))
-                        {
-                            variables[scope].Add(name, floatValue);
-                        }
-                        else if (bool.TryParse(value, out var boolValue))
-                        {
-                            variables[scope].Add(name, boolValue);
-                        }
-                        else if (variables[scope].TryGetValue(value, out object? varVal))
-                        {
-                            variables[scope].Add(name, varVal);
-                        }
-                        else
-                        {
-                            throw new CJException($"Unknown value type: {value}", lineCount);
-                        }
-                    }
-                    else
-                    {
 
-                    }
+                    var expressionResult = EvaluateExpression(expressionTokens);
+
+                    //add variable to scope
+                    variables[scope].Add(name, expressionResult);
+                }
+                else
+                {
+                    throw new CJException("incomplete expression", lineCount);
                 }
 
             }
