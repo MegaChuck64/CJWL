@@ -41,7 +41,6 @@ public class CJStatement
             "else" => StatementType.ElseDeclaration,
             "foreach" => StatementType.ForeachDeclaration,
             "while" => StatementType.WhileDeclaration,
-            _ when split[^1].EndsWith(":") => StatementType.MethodCall,
             _ when split[^1].EndsWith(")") => StatementType.MethodCall,
             _ => StatementType.FieldDeclaration
         };
@@ -104,8 +103,23 @@ public class CJStatement
                 method.Parameters = parms;
                 return (name, returnType, method);
                 
-            //case StatementType.MethodCall:
-            //    break;
+            case StatementType.MethodCall:
+                split = Code.Split(new char[] { ' ', ',', '(', ')' });
+                if (Code.Contains('='))
+                {
+                    
+                }
+                else
+                {
+                    var methodName = split[0];
+                    var args = new List<object>();
+                    for (int i = 1; i < split.Length; i++)
+                    {
+                        args.Add(split[i]);
+                    }
+                    return (methodName, args);
+                }
+                return Code;
             //case StatementType.ForeachDeclaration:
             //    break;
             //case StatementType.IfDeclaration:
@@ -117,6 +131,7 @@ public class CJStatement
             default:
                 return Code;
         }
+        
     }
 
     
