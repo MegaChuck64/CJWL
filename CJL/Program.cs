@@ -12,62 +12,124 @@ if (args.Length == 0)
 }
 
 
-
 var lines = new string[] { };//File.ReadAllLines(args[0]);
 
-int lineCount = 0;
-int scope = 0;
-//list index is scope level,
-//dict key is variable name,
-//dict value is variable value 
-var variables = new List<Dictionary<string, object?>>();
-bool appCreated = false;
 
-var res = EvaluateExpression(new string[] { "1", "+", "2", "-", "2", "+", "5" });
-
-var gg = 0;
-foreach (var line in lines)
+void Run()
 {
-    if (!appCreated)
+    int lineCount = 0;
+    int scope = 0;
+    //list index is scope level,
+    //dict key is variable name,
+    //dict value is variable value 
+    var variables = new List<Dictionary<string, object?>>();
+
+
+    //list index is scope level
+    //dict key is routine name 
+    //dict value is list of lines in that routine
+    var routines = new List<Dictionary<string, List<string>>>();
+    bool appCreated = false;
+
+    var res = EvaluateExpression(new string[] { "1", "+", "2", "-", "2", "+", "5" });
+
+    var gg = 0;
+    foreach (var line in lines)
     {
-        if (line.Trim() == "App:")
+        if (!appCreated)
         {
-            appCreated = true;
-            scope++;
-            variables.Add(new Dictionary<string, object?>());
-        }
-    }
-    else
-    {
-        if (line.StartsWith("var"))
-        {
-            var splt = line.Split(' ');
-            if (splt[0] == "var")
+            if (line.Trim() == "App:")
             {
-                var name = splt[1];
-                if (splt[2] == "=")
+                appCreated = true;
+                scope++;
+                variables.Add(new Dictionary<string, object?>());
+            }
+        }
+        else
+        {
+            if (line.StartsWith("var"))
+            {
+                var splt = line.Split(' ');
+                if (splt[0] == "var")
                 {
-                    var expressionTokens = splt.Skip(3).ToArray();
+                    var name = splt[1];
+                    if (splt[2] == "=")
+                    {
+                        var expressionTokens = splt.Skip(3).ToArray();
 
-                    if (expressionTokens.Length == 0)
-                        throw new CJException("No expression specified after '='.", lineCount);
+                        if (expressionTokens.Length == 0)
+                            throw new CJException("No expression specified after '='.", lineCount);
 
 
-                    var expressionResult = EvaluateExpression(expressionTokens);
+                        var expressionResult = EvaluateExpression(expressionTokens);
 
-                    //add variable to scope
-                    variables[scope].Add(name, expressionResult);
+                        //add variable to scope
+                        variables[scope].Add(name, expressionResult);
+                    }
+                    else
+                    {
+                        throw new CJException("incomplete expression", lineCount);
+                    }
+
+                }
+            }
+            else if (line.StartsWith("jump"))
+            {
+                var splt = line.Split(' ');
+                var labelDest = splt[1];
+
+                if (splt.Length > 2)
+                {
+                    //conditional label
+
                 }
                 else
                 {
-                    throw new CJException("incomplete expression", lineCount);
+                    //jumpt to label
                 }
 
             }
         }
-    }
 
-    lineCount++;
+        lineCount++;
+    }
+}
+
+
+///add references to jump blocks
+void FirstPass(List<string> lines)
+{
+    var appStarted = false;
+    var lineNum = 0;
+    var scope = 0;
+    foreach (var line in lines)
+    {        
+        if (!appStarted)
+        {
+            if (line == "App:")
+            {
+                appStarted = true;
+                scope++;
+            }
+            else
+                throw new CJException("invalid start to app", lineNum);                        
+        }
+        else
+        {
+            if (line.EndsWith(':'))
+            {
+                var split = line.Split(' ');
+                if (split.Length == 1)
+                {
+                    
+                }
+
+                scope++;                
+            }
+        }
+
+        lineNum++;
+    }
 }
 
 //1 + 2 - 2 + 5
@@ -79,10 +141,10 @@ foreach (var line in lines)
 //2
 //+
 //5
-object? EvaluateExpression(string[] tokens)
+object? EvaluateExpression(string[] tokens, int lineNum)
 {
     if (IsOperator(tokens[0]))
-        throw new CJException("Expression cannot start with an operator.", lineCount);
+        throw new CJException("Expression cannot start with an operator.", lineNum);
 
     object? val = null;
     var op = string.Empty;
@@ -106,7 +168,7 @@ object? EvaluateExpression(string[] tokens)
                 var newVal = ParseValue(token);
                 if (valType != newValType)
                 {
-                    throw new CJException($"Cannot perform operation on values of different types: {valType} and {newValType}", lineCount);
+                    throw new CJException($"Cannot perform operation on values of different types: {valType} and {newValType}", lineNum);
                 }
                 else
                 {
@@ -117,33 +179,33 @@ object? EvaluateExpression(string[] tokens)
                             "int" => Convert.ToInt32(val) + Convert.ToInt32(newVal),
                             "float" => Convert.ToSingle(val) + Convert.ToSingle(newVal),
                             "string" => Convert.ToString(val) + Convert.ToString(newVal),
-                            _ => throw new CJException($"Unknown value type: {valType}", lineCount)
+                            _ => throw new CJException($"Unknown value type: {valType}", lineNum)
                         },
                         "-" => valType switch
                         {
                             "int" => Convert.ToInt32(val) - Convert.ToInt32(newVal),
                             "float" => Convert.ToSingle(val) - Convert.ToSingle(newVal),
-                            _ => throw new CJException($"Unknown value type: {valType}", lineCount)
+                            _ => throw new CJException($"Unknown value type: {valType}", lineNum)
                         },
                         "*" => valType switch
                         {
                             "int" => Convert.ToInt32(val) * Convert.ToInt32(newVal),
                             "float" => Convert.ToSingle(val) * Convert.ToSingle(newVal),
-                            _ => throw new CJException($"Unknown value type: {valType}", lineCount)
+                            _ => throw new CJException($"Unknown value type: {valType}", lineNum)
                         },
                         "/" => valType switch
                         {
                             "int" => Convert.ToInt32(val) / Convert.ToInt32(newVal),
                             "float" => Convert.ToSingle(val) / Convert.ToSingle(newVal),
-                            _ => throw new CJException($"Unknown value type: {valType}", lineCount)
+                            _ => throw new CJException($"Unknown value type: {valType}", lineNum)
                         },
                         "%" => valType switch
                         {
                             "int" => Convert.ToInt32(val) * Convert.ToInt32(newVal),
                             "float" => Convert.ToSingle(val) * Convert.ToSingle(newVal),
-                            _ => throw new CJException($"Unknown value type: {valType}", lineCount)
+                            _ => throw new CJException($"Unknown value type: {valType}", lineNum)
                         },
-                        _ => throw new CJException($"Unknown operator: {op}", lineCount)
+                        _ => throw new CJException($"Unknown operator: {op}", lineNum)
                     };
                 }
             }
