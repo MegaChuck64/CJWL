@@ -10,6 +10,7 @@ public static class Parser
     {
         var functionTypes = new Dictionary<string, FunctionType>();
         var functionBodies = new Dictionary<string, FunctionBody>();
+        var functionLocalIndices = new Dictionary<string, Dictionary<string, int>>();
         
         var appStarted = false;
         lines = lines.Where(t => !string.IsNullOrWhiteSpace(t)).Select(c => c.Trim()).ToList();
@@ -34,7 +35,7 @@ public static class Parser
                 }
                 else if (line.StartsWith("external"))
                 {
-                    var splt = line.Split(' ');
+                    var splt = line.Split(' ', '(', ')');
                     var returnType = splt[1];
                     var name = splt[2];
                     var paramsString = line
@@ -42,10 +43,17 @@ public static class Parser
                             line.IndexOf('(') + 1,
                             line.IndexOf(')') - line.IndexOf('(') - 1);
 
-                    var paramTypes = paramsString.Split(',');
-                    for (int j = 0; j < paramTypes.Length; j++)
+                    var parms = paramsString.Split(new char[] { ',' , ' '}, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    var parmTypes = new List<string>();
+                    if (parms.Length > 0)
                     {
-                        paramTypes[j] = paramTypes[j].Trim();
+                        functionLocalIndices[name] = new Dictionary<string, int>();
+                    }
+                    for (int j = 0; j < parms.Length; j++)
+                    {
+                        parmTypes.Add(parms[j]);
+                        j++;                        
+                        functionLocalIndices[name].Add(parms[j], parmTypes.Count - 1);     
                     }
 
                     var paramBytes = new List<byte>();
@@ -53,7 +61,7 @@ public static class Parser
                     {
                         GetValueType(returnType)
                     };
-                    foreach (var paramType in paramTypes)
+                    foreach (var paramType in parmTypes)
                     {
                         var parmTypeByte = GetValueType(paramType);
                         paramBytes.Add(parmTypeByte);
@@ -69,7 +77,6 @@ public static class Parser
                     line = lines[i];
                     while (!line.StartsWith("}"))
                     {
-                        i++;
                         
                         if (lines.Count < i+1)
                         {
@@ -93,7 +100,14 @@ public static class Parser
                         else
                             throw new Exception("Unknown statement type");
                         
-                        var bytes = ParseFunctionBodyLine(statementType, line, out List<Local> locals);
+                        var bytes = 
+                            ParseFunctionBodyLine(
+                                statementType, 
+                                name, 
+                                line, 
+                                ref functionLocalIndices, 
+                                out List<Local> locals);
+                        
                         if (functionBodies.ContainsKey(name))
                         {
                             functionBodies[name].Body.AddRange(bytes);
@@ -103,7 +117,8 @@ public static class Parser
                         {
                             functionBodies.Add(name, new FunctionBody(bytes, locals));
                         }
-
+                        
+                        i++;
                     }
 
                 }
@@ -139,7 +154,9 @@ public static class Parser
 
     public static List<byte> ParseFunctionBodyLine(
         CJStatementType statementType,
+        string functionName,
         string line, 
+        ref Dictionary<string, Dictionary<string, int>> parms,
         out List<Local> locals)
     {
         var bytes = new List<byte>();
@@ -150,10 +167,11 @@ public static class Parser
             case CJStatementType.New:
                 var newSplit = line.Split(' ');
                 var newType = newSplit[1];
-                var newIndex = newSplit[2];
+                var newName = newSplit[2];
                 var newEqual = newSplit[3];
                 var newVal = newSplit[4];
                 locals.Add(new Local(GetValueType(newType)));
+                parms[functionName][newName] = parms[functionName].Count;
                 //i32.const val
                 bytes.Add(GetConstOpValue(newType));
                 bytes.AddRange(
@@ -161,38 +179,38 @@ public static class Parser
 
                 //set local index
                 bytes.Add(0x21);
-                bytes.Add((byte)int.Parse(newIndex));
+                bytes.Add((byte)parms[functionName][newName]);
                 break;
             case CJStatementType.Add:
                 var addSplit = line.Split(' ');
                 var addType = addSplit[1];
-                var addIndex = addSplit[2];
+                var addName = addSplit[2];
                 var addEqual = addSplit[3];
                 var addLeft = addSplit[4];
                 var addRight = addSplit[5];
                 //local.get left
                 bytes.Add(GetVariableAccessOpValue("get"));
-                bytes.Add((byte)int.Parse(addLeft));
+                bytes.Add((byte)parms[functionName][addLeft]);
                 //local.get right
                 bytes.Add(GetVariableAccessOpValue("get"));
-                bytes.Add((byte)int.Parse(addRight));
+                bytes.Add((byte)parms[functionName][addRight]);
 
                 //add
                 bytes.Add(GetNumericOpValue(addType + ".add"));
 
                 //local.set index
                 bytes.Add(GetVariableAccessOpValue("set"));
-                bytes.Add((byte)int.Parse(addIndex));
+                bytes.Add((byte)parms[functionName][addName]);
 
                 break;
             case CJStatementType.Return:
                 var returnSplit = line.Split(' ');
-                var returnType = returnSplit[1];
-                var returnIndex = returnSplit[2];
+                //var returnType = returnSplit[1];
+                var returnName = returnSplit[1];
 
                 //local.get index
                 bytes.Add(GetVariableAccessOpValue("get"));
-                bytes.Add((byte)int.Parse(returnIndex));
+                bytes.Add((byte)parms[functionName][returnName]);
                 break;
             default:
                 throw new Exception("unknown statement type");

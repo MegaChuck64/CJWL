@@ -1,18 +1,12 @@
 App
 
-external i32 addTwoPlusTen (i32, i32)
+external i32 addTwoPlusEleven(i32 left, i32 right)
 {
-	//new declares a new local of type i32 at index 2 intiailizing with literal 10
-	new i32 2 = 10
+	new i32 eleven = 11
+	new i32 result = 0
 	
-	//new i32 at index 3 initializing with literal 0
-	new i32 3 = 0
+	add i32 result = left right
+	add i32 result = eleven result
 	
-	//add i32 setting result to index 3 of adding index 0 and index 1
-	add i32 3 = 0 1
-	//add i32 setting result to index 3 of adding index 2 and index 3
-	add i32 3 = 2 3
-	
-	//return i32 at index 3
-	return i32 3
+	return result	
 }
