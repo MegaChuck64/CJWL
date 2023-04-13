@@ -1,16 +1,46 @@
-﻿// See https://aka.ms/new-console-template for more information
-using CJWasm;
+﻿using CJWasm;
 using CJWasm.LEB128;
 using CJWasm.Models;
 using CJWasm.Sections;
 
 Console.WriteLine("Hello, World!");
 
-using var fs = new FileStream(@"Y:\source\2023\March\CJWL\CJWasm\output.wasm", FileMode.OpenOrCreate);
-var bytes = Run();
+var lines = new List<string>
+{
+    "App",
+    "external i32 addTwoPlusTen (i32, i32)",
+    "{",
+    
+        "//new declares a new local of type i32 at index 2 intiailizing with literal 10",
+        "new i32 2 = 10",
+    
+        "//new i32 at index 3 initializing with literal 0",
+        "new i32 3 = 0",
+    
+        "//add i32 setting result to index 3 of adding index 0 and index 1",
+        "add i32 3 = 0 1",
+    
+        "//add i32 setting result to index 3 of adding index 2 and index 3",
+        "add i32 3 = 2 3",
+    
+        "//return i32 at index 3",
+        "return i32 3",
+    
+    "}"
+};
+using var fs = new FileStream(@"Y:\source\2023\March\CJWL\CJWasm\output.wasm", FileMode.Create);
+
+
+var bytes = Compile(lines);
 fs.Write(bytes);
 
 
+byte[] Compile(List<string> lines)
+{
+    var module = Parser.Parse(lines);
+
+    return module.ToBytes();
+}
 
 byte[] Run()
 {
@@ -65,8 +95,8 @@ byte[] Run()
         
             new List<Local>
             {
-                new Local(1, (byte)WasmValueType.I32),
-                new Local(1, (byte)WasmValueType.I64),
+                new Local((byte)WasmValueType.I32),
+                new Local((byte)WasmValueType.I64),
             }
         )
     };
