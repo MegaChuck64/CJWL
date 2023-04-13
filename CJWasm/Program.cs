@@ -3,33 +3,48 @@ using CJWasm.LEB128;
 using CJWasm.Models;
 using CJWasm.Sections;
 
-Console.WriteLine("Hello, World!");
-
-var lines = new List<string>
+#if DEBUG
 {
-    "App",
-    "external i32 addTwoPlusTen (i32, i32)",
-    "{",
-    
-        "//new declares a new local of type i32 at index 2 intiailizing with literal 10",
-        "new i32 2 = 10",
-    
-        "//new i32 at index 3 initializing with literal 0",
-        "new i32 3 = 0",
-    
-        "//add i32 setting result to index 3 of adding index 0 and index 1",
-        "add i32 3 = 0 1",
-    
-        "//add i32 setting result to index 3 of adding index 2 and index 3",
-        "add i32 3 = 2 3",
-    
-        "//return i32 at index 3",
-        "return i32 3",
-    
-    "}"
-};
-using var fs = new FileStream(@"Y:\source\2023\March\CJWL\CJWasm\output.wasm", FileMode.Create);
+    args = new string[]
+    {
+        "-s", "test.cjwl",
+        "-o", "output.wasm",
+    };
+}
+#endif
 
+var source = string.Empty;
+var output = string.Empty;
+for (int i = 0; i < args.Length; i++)
+{
+    switch (args[i])
+    {
+        case "-s":
+            i++;
+            source = args[i];
+            break;
+        case "-o":
+            i++;
+            output = args[i];
+            break;
+        default:
+            Console.WriteLine("Unknown argument: " + args[i]);
+            break;
+    }
+}
+if (string.IsNullOrEmpty(source))
+{
+    Console.WriteLine("No source file specified.");
+    return;
+}
+if (string.IsNullOrEmpty(output))
+{
+    Console.WriteLine("No output file specified.");
+    return;
+}
+
+var lines = File.ReadAllLines(source).ToList();
+using var fs = new FileStream(output, FileMode.Create);
 
 var bytes = Compile(lines);
 fs.Write(bytes);
