@@ -75,6 +75,7 @@ public static class Parser
                     }
                     i++;
                     line = lines[i];
+                    var waitingForBlockClose = 0;
                     while (!line.StartsWith("}"))
                     {
                         
@@ -87,16 +88,30 @@ public static class Parser
                         if (line.StartsWith(@"//"))
                             continue;
 
+                        if (line.StartsWith("{"))
+                            waitingForBlockClose++;
+
                         if (line.StartsWith("}"))
-                            break;
+                        {
+                            if (waitingForBlockClose > 0)
+                                waitingForBlockClose--;
+                            else
+                                break;
+                        }
+                        
+
 
                         CJStatementType statementType;
                         if (line.StartsWith("new"))
                             statementType = CJStatementType.New;
                         else if (line.StartsWith("add"))
                             statementType = CJStatementType.Add;
+                        else if (line.StartsWith("if"))
+                            statementType = CJStatementType.If;
                         else if (line.StartsWith("return"))
                             statementType = CJStatementType.Return;
+                        else if (line.StartsWith("end"))
+                            statementType = CJStatementType.End;
                         else
                             throw new Exception("Unknown statement type");
                         
@@ -203,6 +218,36 @@ public static class Parser
                 bytes.Add((byte)parms[functionName][addName]);
 
                 break;
+
+            case CJStatementType.If:
+                var ifSplit = line.Split(' ');
+                var ifType = ifSplit[1];
+                var ifOp = ifSplit[2];
+                var ifLeft = ifSplit[3];
+                var ifRight = ifSplit[4];
+
+
+                //push left var to stack
+                //push right var to stack
+                //conditional op
+
+                //if
+                //body
+                //end
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][ifLeft]);
+                
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][ifRight]);
+
+                bytes.Add(GetComparisonOpValue(ifType + "." + ifOp));
+
+                bytes.Add(GetControlFlowOpValue("if"));
+                
+                break;
+            case CJStatementType.End:
+                bytes.Add(GetControlFlowOpValue("end"));
+                break;
             case CJStatementType.Return:
                 var returnSplit = line.Split(' ');
                 //var returnType = returnSplit[1];
@@ -305,6 +350,108 @@ public static class Parser
         }
     }
 
+    
+    public static byte GetControlFlowOpValue(string type)
+    {
+        switch (type)
+        {
+            case "block":
+                return 0x02;
+            case "loop":
+                return 0x03;
+            case "if":
+                return 0x04;
+            case "else":
+                return 0x05;
+            case "end":
+                return 0x0b;
+            case "br":
+                return 0x0c;
+            case "br_if":
+                return 0x0d;
+            case "return":
+                return 0x0f;
+            default:
+                throw new Exception("Invalid type");
+        }
+    }
+
+    public static byte GetComparisonOpValue(string type)
+    {
+        switch (type)
+        {
+            case "i32.eqz":
+                return 0x45;
+            case "i32.eq":
+                return 0x46;
+            case "i32.ne":
+                return 0x47;
+            case "i32.lt_s":
+                return 0x48;
+            case "i32.lt_u":
+                return 0x49;
+            case "i32.gt_s":
+                return 0x4a;
+            case "i32.gt_u":
+                return 0x4b;
+            case "i32.le_s":
+                return 0x4c;
+            case "i32.le_u":
+                return 0x4d;
+            case "i32.ge_s":
+                return 0x4e;
+            case "i32.ge_u":
+                return 0x4f;
+            case "i64.eqz":
+                return 0x50;
+            case "i64.eq":
+                return 0x51;
+            case "i64.ne":
+                return 0x52;
+            case "i64.lt_s":
+                return 0x53;
+            case "i64.lt_u":
+                return 0x54;
+            case "i64.gt_s":
+                return 0x55;
+            case "i64.gt_u":
+                return 0x56;
+            case "i64.le_s":
+                return 0x57;
+            case "i64.le_u":
+                return 0x58;
+            case "i64.ge_s":
+                return 0x59;
+            case "i64.ge_u":
+                return 0x5a;
+            case "f32.eq":
+                return 0x5b;
+            case "f32.ne":
+                return 0x5c;
+            case "f32.lt":
+                return 0x5d;
+            case "f32.gt":
+                return 0x5e;
+            case "f32.le":
+                return 0x5f;
+            case "f32.ge":
+                return 0x60;
+            case "f64.eq":
+                return 0x61;
+            case "f64.ne":
+                return 0x62;
+            case "f64.lt":
+                return 0x63;
+            case "f64.gt":
+                return 0x64;
+            case "f64.le":
+                return 0x65;
+            case "f64.ge":
+                return 0x66;                                    
+            default:
+                throw new Exception("Invalid type");
+        }
+    }
     public static byte GetNumericOpValue(string type)
     {
         switch (type)
