@@ -1,21 +1,11 @@
 App
 
-external i32 addTwoPlusEleven(i32 left, i32 right)
-{
-	new i32 eleven = 11
-	new i32 result = 0
-	
-	add i32 result = left right
-	add i32 result = eleven result
-	
-	return result	
-}
 
 external i32 addTwoIfZero(i32 left, i32 right, i32 condition)
 {
 	new i32 result = 0
 	
-	if i32 eq condition result
+	if i32 eq result condition
 		add i32 result = left right
 	end
 	

@@ -243,7 +243,7 @@ public static class Parser
                 bytes.Add(GetComparisonOpValue(ifType + "." + ifOp));
 
                 bytes.Add(GetControlFlowOpValue("if"));
-                
+                bytes.Add(GetConstOpValue("void"));
                 break;
             case CJStatementType.End:
                 bytes.Add(GetControlFlowOpValue("end"));
@@ -324,6 +324,8 @@ public static class Parser
     {
         switch (type)
         {
+            case "void":
+                return 0x40;
             case "i32":
                 return 0x41;
             case "i64":

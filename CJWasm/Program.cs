@@ -15,6 +15,9 @@ using CJWasm.Sections;
 
 var source = string.Empty;
 var output = string.Empty;
+
+
+
 for (int i = 0; i < args.Length; i++)
 {
     switch (args[i])
@@ -129,9 +132,6 @@ byte[] Run()
 
     return module.ToBytes();
 }
-
-
-
 
 
 
