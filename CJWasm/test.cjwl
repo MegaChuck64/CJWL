@@ -12,3 +12,16 @@ external i32 addTwoIfZero(i32 left, i32 right, i32 condition)
 	return result
 }  
 
+
+external i32 isGreaterThan(i32 left, i32 right)
+{
+	new i32 result = 0
+	new i32 resTrue = 1
+	
+	if i32 gt_s left right
+		add i32 result = result resTrue
+	end
+
+	return result
+		
+}
