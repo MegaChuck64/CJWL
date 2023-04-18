@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Content Include="test.cjwl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

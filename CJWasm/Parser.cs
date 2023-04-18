@@ -66,7 +66,7 @@ public static class Parser
                         var parmTypeByte = GetValueType(paramType);
                         paramBytes.Add(parmTypeByte);
                     }
-                    functionTypes.Add(name, new FunctionType(paramBytes, returnBytes));                    
+                    functionTypes.Add(name, new FunctionType(paramBytes, returnBytes));       
                     i++;
                     line = lines[i];
                     if (!line.StartsWith("{"))
@@ -106,6 +106,14 @@ public static class Parser
                             statementType = CJStatementType.New;
                         else if (line.StartsWith("add"))
                             statementType = CJStatementType.Add;
+                        else if (line.StartsWith("sub"))
+                            statementType = CJStatementType.Sub;
+                        else if (line.StartsWith("mul"))
+                            statementType = CJStatementType.Mul;
+                        else if (line.StartsWith("div"))
+                            statementType = CJStatementType.Div;
+                        else if (line.StartsWith("mod"))
+                            statementType = CJStatementType.Mod;
                         else if (line.StartsWith("if"))
                             statementType = CJStatementType.If;
                         else if (line.StartsWith("return"))
@@ -218,7 +226,96 @@ public static class Parser
                 bytes.Add((byte)parms[functionName][addName]);
 
                 break;
+            case CJStatementType.Sub:
+                var subSplit = line.Split(' ');
+                var subType = subSplit[1];
+                var subName = subSplit[2];
+                var subEqual = subSplit[3];
+                var subLeft = subSplit[4];
+                var subRight = subSplit[5];
+                //local.get left
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][subLeft]);
+                //local.get right
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][subRight]);
 
+                //sub
+                bytes.Add(GetNumericOpValue(subType + ".sub"));
+
+                //local.set index
+                bytes.Add(GetVariableAccessOpValue("set"));
+                bytes.Add((byte)parms[functionName][subName]);
+                
+                break;
+
+            case CJStatementType.Mul:
+                var mulSplit = line.Split(' ');
+                var mulType = mulSplit[1];
+                var mulName = mulSplit[2];
+                var mulEqual = mulSplit[3];
+                var mulLeft = mulSplit[4];
+                var mulRight = mulSplit[5];
+                //local.get left
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][mulLeft]);
+                //local.get right
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][mulRight]);
+
+                //mul
+                bytes.Add(GetNumericOpValue(mulType + ".mul"));
+
+                //local.set index
+                bytes.Add(GetVariableAccessOpValue("set"));
+                bytes.Add((byte)parms[functionName][mulName]);
+                
+                break;
+
+            case CJStatementType.Div:
+                var divSplit = line.Split(' ');
+                var divType = divSplit[1];
+                var divName = divSplit[2];
+                var divEqual = divSplit[3];
+                var divLeft = divSplit[4];
+                var divRight = divSplit[5];
+                //local.get left
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][divLeft]);
+                //local.get right
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][divRight]);
+
+                //div
+                bytes.Add(GetNumericOpValue(divType + ".div_s"));
+
+                //local.set index
+                bytes.Add(GetVariableAccessOpValue("set"));
+                bytes.Add((byte)parms[functionName][divName]);
+
+                break;
+            case CJStatementType.Mod:
+                var modSplit = line.Split(' ');
+                var modType = modSplit[1];
+                var modName = modSplit[2];
+                var modEqual = modSplit[3];
+                var modLeft = modSplit[4];
+                var modRight = modSplit[5];
+                //local.get left
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][modLeft]);
+                //local.get right
+                bytes.Add(GetVariableAccessOpValue("get"));
+                bytes.Add((byte)parms[functionName][modRight]);
+
+                //mod
+                bytes.Add(GetNumericOpValue(modType + ".rem_s"));
+
+                //local.set index
+                bytes.Add(GetVariableAccessOpValue("set"));
+                bytes.Add((byte)parms[functionName][modName]);
+
+                break;
             case CJStatementType.If:
                 var ifSplit = line.Split(' ');
                 var ifType = ifSplit[1];
@@ -520,7 +617,7 @@ public static class Parser
                 return 0x84;
             case "i64.xor":
                 return 0x85;
-                case "i64.shl":
+            case "i64.shl":
                 return 0x86;
             case "i64.shr_s":
                 return 0x87;

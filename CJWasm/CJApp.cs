@@ -51,6 +51,10 @@ public enum CJStatementType
 {
     New,
     Add,
+    Sub,    
+    Mul,
+    Div,
+    Mod,    
     If,
     End,
     Return

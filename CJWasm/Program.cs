@@ -10,6 +10,8 @@ using CJWasm.Sections;
         "-s", "test.cjwl",
         "-o", "output.wasm",
     };
+
+
 }
 #endif
 
@@ -132,7 +134,6 @@ byte[] Run()
 
     return module.ToBytes();
 }
-
 
 
 
