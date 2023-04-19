@@ -1,5 +1,5 @@
 const request = new XMLHttpRequest();
-request.open("GET", "output.wasm");
+request.open("GET", "test.wasm");
 request.responseType = "arraybuffer";
 request.send();
 
@@ -20,9 +20,9 @@ request.onload = () => {
 
     Test_SubTwoIfPositive(subTwoIfPositive);
 
-    const { isNegative } = results.instance.exports;
+    // const { isNegative } = results.instance.exports;
 
-    Test_IsNegative(isNegative);    
+    // Test_IsNegative(isNegative);    
         
     // const { mulIfLessThan } = results.instance.exports;
 

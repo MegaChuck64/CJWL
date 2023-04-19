@@ -19,6 +19,51 @@
     
     local.get 3
   )
+  
+  (func (export "isGreaterThan")
+  	(param i32 i32)
+    (result i32)
+    (local i32 i32)
+    
+    i32.const 0
+    local.set 2
+    
+    i32.const 1
+    local.set 3
+    
+    local.get 0
+    local.get 1
+    i32.gt_s
+    if
+    local.get 2
+    local.get 3
+    i32.add
+    local.set 2
+    end
+    
+    local.get 2
+  )
+
+  (func (export "subTwoIfPositive")
+    (param i32 i32)
+    (result i32)
+    (local i32)
+
+    i32.const 0
+    local.set 2
+
+    local.get 0
+    local.get 1
+    i32.gt_s
+    if
+    local.get 0
+    local.get 1
+    i32.sub
+    local.set 2
+    end
+
+    local.get 2    
+  )
 )
 
 ;; i32.const 0 (41, 00)
