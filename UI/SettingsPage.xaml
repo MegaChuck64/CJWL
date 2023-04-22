@@ -15,6 +15,9 @@
         <TextBlock Text="Settings" FontSize="30" Margin="10" />
         <Button x:Name="WabtButton" Content="Select Wabt Directory" Click="WabtButton_Click" Margin="10" />
         <TextBlock x:Name="WabtDirectory" Text="Wabt Directory" Margin="10" />
-        
+
+        <Button x:Name="InputPathButton" Content="Select Input Path" Click="InputPathButton_Click" Margin="10" />
+        <TextBlock x:Name="InputPath" Text="Input Path" Margin="10" />
+
     </StackPanel>
 </Page>

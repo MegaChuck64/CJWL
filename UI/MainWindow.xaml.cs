@@ -46,15 +46,12 @@ namespace UI
                 NavigationViewItem item = args.SelectedItem as NavigationViewItem;
                 switch (item.Tag)
                 {
-                    //case "home":
-                    //    contentFrame.Navigate(typeof(HomePage));
-                    //    break;
+                    case "Wat2Wasm":
+                        contentFrame.Navigate(typeof(Wat2Wasm));
+                        break;
                     //case "dashboard":
                     //    contentFrame.Navigate(typeof(DashboardPage));
                     //    break;
-                    case "settings":
-                        contentFrame.Navigate(typeof(SettingsPage));
-                        break;
                 }
             }
         }

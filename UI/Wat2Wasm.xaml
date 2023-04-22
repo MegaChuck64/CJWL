@@ -1,0 +1,100 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Page
+    x:Class="UI.Wat2Wasm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <DataTemplate x:Key="MessageViewTemplate" x:DataType="local:Message">
+                <Grid Height="Auto" Margin="4" HorizontalAlignment="{x:Bind MsgAlignment}">
+                    <StackPanel MinHeight="75" Width="Auto" Padding="10, 0, 0, 10" Background="{x:Bind BgColor}" CornerRadius="{StaticResource ControlCornerRadius}">
+                        <TextBlock Text="{x:Bind MsgText}" Padding="0, 10, 0, 0" FontSize="20" Foreground="{ThemeResource SystemControlForegroundAltHighBrush}"/>
+                        <TextBlock Text="{x:Bind MsgDateTime}" Padding="0, 0, 0, 10" FontSize="15" Foreground="{ThemeResource SystemControlForegroundAltMediumHighBrush}"/>
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="ArgViewTemplate" x:DataType="local:ArgView">
+                <Grid Height="Auto" Margin="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <AppBarButton x:Name="DeleteArgButton" Icon="Delete" Click="DeleteArgButton_Click"  Grid.Column="0"/>
+                    <TextBlock Text="{x:Bind Text}" Grid.Column="1" Padding="0, 10, 0, 0" FontSize="20" Foreground="{ThemeResource SystemControlForegroundChromeWhiteBrush}"/>
+                </Grid>
+            </DataTemplate>
+        </Grid.Resources>
+        <CommandBar Background="Transparent" IsOpen="False" DefaultLabelPosition="Right" HorizontalAlignment="Left">
+            <AppBarButton Icon="Play" Label="Run" Click="RunButton_Click"/>
+            <AppBarButton Icon="Edit" Label="Args">
+                <AppBarButton.Flyout>
+                    <Flyout>
+                        <StackPanel>
+                            <ListView x:Name="ArgListView"
+                                ItemTemplate="{StaticResource ArgViewTemplate}">
+                                
+                            </ListView>
+                        </StackPanel>
+                    </Flyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarButton x:Name="ClearButton" Click="ClearButton_Click" Icon="Clear"  Label="Clear"/>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Icon="Help"  Label="Help" Click="HelpButton_Click">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="H" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+        
+        <ListView x:Name="InvertedListView"
+                    ItemTemplate="{StaticResource MessageViewTemplate}"
+                    ScrollViewer.VerticalScrollMode="Enabled"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    ScrollViewer.IsVerticalRailEnabled="True"
+                    Grid.Row="1"
+                    VerticalAlignment="Top">
+
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView"
+                        VerticalAlignment="Bottom" ScrollViewer.VerticalScrollMode="Enabled"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+
+        <AutoSuggestBox
+            x:Name="InputBox"
+            PlaceholderText="Add arg here..."
+            Grid.Row="2"
+            Margin="10, 0, 10, 10"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Bottom"
+            TextChanged="InputBox_TextChanged"
+            QuerySubmitted="InputBox_QuerySubmitted"
+            Text=""/>
+
+    </Grid>
+
+
+</Page>

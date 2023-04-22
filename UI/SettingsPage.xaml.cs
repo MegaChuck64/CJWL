@@ -35,11 +35,15 @@ namespace UI
             this.InitializeComponent();
 
             //set wabt directory from futureaccesslist if it exists
-            if (StorageApplicationPermissions.FutureAccessList.ContainsItem("WabtDirectory"))
+            if (!string.IsNullOrEmpty(Settings.WabtDirectory))
             {
-                StorageFolder wabtFolder = StorageApplicationPermissions.FutureAccessList.GetFolderAsync("WabtDirectory").GetAwaiter().GetResult();
-                WabtDirectory.Text = wabtFolder.Path;
-            }
+                WabtDirectory.Text = Settings.WabtDirectory;
+            }                      
+            
+            if (!string.IsNullOrEmpty(Settings.InputPath))
+            {
+                InputPath.Text = Settings.InputPath;
+            }        
         }
 
         private async void WabtButton_Click(object sender, RoutedEventArgs e)
@@ -64,10 +68,33 @@ namespace UI
             WabtDirectory.Text = folder.Path;
 
             //save folder path
-            StorageApplicationPermissions.FutureAccessList.AddOrReplace("WabtDirectory", folder);
+            Settings.UpdateWabtDirectory(folder);
 
         }
 
+        private async void InputPathButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Create a folder picker.
+            var filePicker = new FileOpenPicker();
 
+
+            var window = (Application.Current as App)?.Window as MainWindow;
+
+            // 1. Retrieve the window handle (HWND) of the current WinUI 3 window.
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+
+            // 2. Initialize the folder picker with the window handle (HWND).
+            WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hWnd);
+
+            // Use the folder picker as usual.
+            filePicker.FileTypeFilter.Add("*");
+            var file = await filePicker.PickSingleFileAsync();
+
+            //updatethe textblock
+            InputPath.Text = file.Path;
+
+            //save folder path
+            Settings.UpdateInputPath(file);
+        }
     }
 }
