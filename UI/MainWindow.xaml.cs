@@ -46,6 +46,9 @@ namespace UI
                 NavigationViewItem item = args.SelectedItem as NavigationViewItem;
                 switch (item.Tag)
                 {
+                    case "Builder":
+                        contentFrame.Navigate(typeof(Builder));
+                        break;
                     case "Wat2Wasm":
                         contentFrame.Navigate(typeof(Wat2Wasm));
                         break;

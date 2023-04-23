@@ -12,8 +12,8 @@
 
     <NavigationView x:Name="NavView" SelectionChanged="NavView_SelectionChanged">
         <NavigationView.MenuItems >
-            <NavigationViewItem Icon="Home"  Content="Wat2Wasm" Tag="Wat2Wasm" />
-            <NavigationViewItem Icon="Play" Content="Menu Item1" Tag="SamplePage1" />
+            <NavigationViewItem Icon="Manage" Content="Builder" Tag="Builder" />
+            <NavigationViewItem Icon="Calculator"  Content="Wat2Wasm" Tag="Wat2Wasm" />
             <NavigationViewItem Icon="Save" Content="Menu Item2" Tag="SamplePage2" />
             <NavigationViewItem Icon="Refresh" Content="Menu Item3" Tag="SamplePage3" />
             <NavigationViewItem Icon="Download" Content="Menu Item4" Tag="SamplePage4" />
