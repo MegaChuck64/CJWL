@@ -8,13 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="test.cjwl" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="test.cjwl">
+    <None Update="test.cjwl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>

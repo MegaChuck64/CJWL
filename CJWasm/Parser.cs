@@ -363,35 +363,25 @@ public static class Parser
     
     public static WasmValueType ParseValueType(string type)
     {
-        switch (type)
+        return type switch
         {
-            case "i32":
-                return WasmValueType.I32;
-            case "i64":
-                return WasmValueType.I64;
-            case "f32":
-                return WasmValueType.F32;
-            case "f64":
-                return WasmValueType.F64;
-            default:
-                throw new Exception("Unknown type");
-        }
+            "i32" => WasmValueType.I32,
+            "i64" => WasmValueType.I64,
+            "f32" => WasmValueType.F32,
+            "f64" => WasmValueType.F64,
+            _ => throw new Exception("Unknown type"),
+        };
     }
     public static byte GetValueType(string type)
     {
-        switch (type)
+        return type switch
         {
-            case "i32":
-                return Convert.ToByte(WasmValueType.I32);
-            case "i64":
-                return Convert.ToByte(WasmValueType.I64);
-            case "f32":
-                return Convert.ToByte(WasmValueType.F32);
-            case "f64":
-                return Convert.ToByte(WasmValueType.F64);
-            default:
-                throw new Exception("Invalid type");
-        }
+            "i32" => Convert.ToByte(WasmValueType.I32),
+            "i64" => Convert.ToByte(WasmValueType.I64),
+            "f32" => Convert.ToByte(WasmValueType.F32),
+            "f64" => Convert.ToByte(WasmValueType.F64),
+            _ => throw new Exception("Invalid type"),
+        };
     }
 
     public static List<byte> GetValueBytes(WasmValueType type, string value)
@@ -419,277 +409,155 @@ public static class Parser
     }
     public static byte GetConstOpValue(string type)
     {
-        switch (type)
+        return type switch
         {
-            case "void":
-                return 0x40;
-            case "i32":
-                return 0x41;
-            case "i64":
-                return 0x42;
-            case "f32":
-                return 0x43;
-            case "f64":
-                return 0x44;
-            default:
-                throw new Exception("Invalid type");
-        }
+            "void" => 0x40,
+            "i32" => 0x41,
+            "i64" => 0x42,
+            "f32" => 0x43,
+            "f64" => 0x44,
+            _ => throw new Exception("Invalid type"),
+        };
     }
 
     public static byte GetVariableAccessOpValue(string type)
     {
-        switch (type)
+        return type switch
         {
-            case "get":
-                return 0x20;
-            case "set":
-                return 0x21;
-            default:
-                throw new Exception("Invalid type");
-        }
+            "get" => 0x20,
+            "set" => 0x21,
+            _ => throw new Exception("Invalid type"),
+        };
     }
 
     
     public static byte GetControlFlowOpValue(string type)
     {
-        switch (type)
+        return type switch
         {
-            case "block":
-                return 0x02;
-            case "loop":
-                return 0x03;
-            case "if":
-                return 0x04;
-            case "else":
-                return 0x05;
-            case "end":
-                return 0x0b;
-            case "br":
-                return 0x0c;
-            case "br_if":
-                return 0x0d;
-            case "return":
-                return 0x0f;
-            default:
-                throw new Exception("Invalid type");
-        }
+            "block" => 0x02,
+            "loop" => 0x03,
+            "if" => 0x04,
+            "else" => 0x05,
+            "end" => 0x0b,
+            "br" => 0x0c,
+            "br_if" => 0x0d,
+            "return" => 0x0f,
+            _ => throw new Exception("Invalid type"),
+        };
     }
 
     public static byte GetComparisonOpValue(string type)
     {
-        switch (type)
+        return type switch
         {
-            case "i32.eqz":
-                return 0x45;
-            case "i32.eq":
-                return 0x46;
-            case "i32.ne":
-                return 0x47;
-            case "i32.lt_s":
-                return 0x48;
-            case "i32.lt_u":
-                return 0x49;
-            case "i32.gt_s":
-                return 0x4a;
-            case "i32.gt_u":
-                return 0x4b;
-            case "i32.le_s":
-                return 0x4c;
-            case "i32.le_u":
-                return 0x4d;
-            case "i32.ge_s":
-                return 0x4e;
-            case "i32.ge_u":
-                return 0x4f;
-            case "i64.eqz":
-                return 0x50;
-            case "i64.eq":
-                return 0x51;
-            case "i64.ne":
-                return 0x52;
-            case "i64.lt_s":
-                return 0x53;
-            case "i64.lt_u":
-                return 0x54;
-            case "i64.gt_s":
-                return 0x55;
-            case "i64.gt_u":
-                return 0x56;
-            case "i64.le_s":
-                return 0x57;
-            case "i64.le_u":
-                return 0x58;
-            case "i64.ge_s":
-                return 0x59;
-            case "i64.ge_u":
-                return 0x5a;
-            case "f32.eq":
-                return 0x5b;
-            case "f32.ne":
-                return 0x5c;
-            case "f32.lt":
-                return 0x5d;
-            case "f32.gt":
-                return 0x5e;
-            case "f32.le":
-                return 0x5f;
-            case "f32.ge":
-                return 0x60;
-            case "f64.eq":
-                return 0x61;
-            case "f64.ne":
-                return 0x62;
-            case "f64.lt":
-                return 0x63;
-            case "f64.gt":
-                return 0x64;
-            case "f64.le":
-                return 0x65;
-            case "f64.ge":
-                return 0x66;                                    
-            default:
-                throw new Exception("Invalid type");
-        }
+            "i32.eqz" => 0x45,
+            "i32.eq" => 0x46,
+            "i32.ne" => 0x47,
+            "i32.lt_s" => 0x48,
+            "i32.lt_u" => 0x49,
+            "i32.gt_s" => 0x4a,
+            "i32.gt_u" => 0x4b,
+            "i32.le_s" => 0x4c,
+            "i32.le_u" => 0x4d,
+            "i32.ge_s" => 0x4e,
+            "i32.ge_u" => 0x4f,
+            "i64.eqz" => 0x50,
+            "i64.eq" => 0x51,
+            "i64.ne" => 0x52,
+            "i64.lt_s" => 0x53,
+            "i64.lt_u" => 0x54,
+            "i64.gt_s" => 0x55,
+            "i64.gt_u" => 0x56,
+            "i64.le_s" => 0x57,
+            "i64.le_u" => 0x58,
+            "i64.ge_s" => 0x59,
+            "i64.ge_u" => 0x5a,
+            "f32.eq" => 0x5b,
+            "f32.ne" => 0x5c,
+            "f32.lt" => 0x5d,
+            "f32.gt" => 0x5e,
+            "f32.le" => 0x5f,
+            "f32.ge" => 0x60,
+            "f64.eq" => 0x61,
+            "f64.ne" => 0x62,
+            "f64.lt" => 0x63,
+            "f64.gt" => 0x64,
+            "f64.le" => 0x65,
+            "f64.ge" => 0x66,
+            _ => throw new Exception("Invalid type"),
+        };
     }
     public static byte GetNumericOpValue(string type)
     {
-        switch (type)
+        return type switch
         {
-            case "i32.clz":
-                return 0x67;
-            case "i32.ctz":
-                return 0x068;
-            case "i32.popcnt":
-                return 0x69;
-            case "i32.add":
-                return 0x6A;
-            case "i32.sub":
-                return 0x6B;
-            case "i32.mul":
-                return 0x6C;
-            case "i32.div_s":
-                return 0x6D;
-            case "i32.div_u":
-                return 0x6E;
-            case "i32.rem_s":
-                return 0x6F;
-            case "i32.rem_u":
-                return 0x70;
-            case "i32.and":
-                return 0x71;
-            case "i32.or":
-                return 0x72;
-            case "i32.xor":
-                return 0x73;
-            case "i32.shl":
-                return 0x74;
-            case "i32.shr_s":
-                return 0x75;
-            case "i32.shr_u":
-                return 0x76;
-            case "i32.rotl":
-                return 0x77;
-            case "i32.rotr":
-                return 0x78;
-            case "i64.clz":
-                return 0x79;
-            case "i64.ctz":
-                return 0x7A;
-            case "i64.popcnt":
-                return 0x7B;
-            case "i64.add":
-                return 0x7C;
-            case "i64.sub":
-                return 0x7D;
-            case "i64.mul":
-                return 0x7E;
-            case "i64.div_s":
-                return 0x7F;
-            case "i64.div_u":
-                return 0x80;
-            case "i64.rem_s":
-                return 0x81;
-            case "i64.rem_u":
-                return 0x82;
-            case "i64.and":
-                return 0x83;
-            case "i64.or":
-                return 0x84;
-            case "i64.xor":
-                return 0x85;
-            case "i64.shl":
-                return 0x86;
-            case "i64.shr_s":
-                return 0x87;
-
-            case "i64.shr_u":
-
-                return 0x88;
-            case "i64.rotl":
-                return 0x89;
-            case "i64.rotr":
-                return 0x8A;
-            case "f32.abs":
-                return 0x8B;
-            case "f32.neg":
-                return 0x8C;
-            case "f32.ceil":
-                return 0x8D;
-            case "f32.floor":
-                return 0x8E;
-            case "f32.trunc":
-                return 0x8F;
-            case "f32.nearest":
-                return 0x90;
-            case "f32.sqrt":
-                return 0x91;
-            case "f32.add":
-                return 0x92;
-            case "f32.sub":
-                return 0x93;
-            case "f32.mul":
-                return 0x94;
-            case "f32.div":
-                return 0x95;
-            case "f32.min":
-                return 0x96;
-            case "f32.max":
-                return 0x97;
-            case "f32.copysign":
-                return 0x98;
-            case "f64.abs":
-                return 0x99;
-            case "f64.neg":
-                return 0x9A;
-            case "f64.ceil":
-                return 0x9B;
-            case "f64.floor":
-                return 0x9C;
-            case "f64.trunc":
-                return 0x9D;
-            case "f64.nearest":
-                return 0x9E;
-            case "f64.sqrt":
-                return 0x9F;
-
-            case "f64.add":
-                return 0xA0;
-            case "f64.sub":
-                return 0xA1;
-            case "f64.mul":
-                return 0xA2;
-            case "f64.div":
-                return 0xA3;
-            case "f64.min":
-                return 0xA4;
-            case "f64.max":
-                return 0xA5;
-            case "f64.copysign":
-                return 0xA6;
-
-            default:
-                throw new Exception("Invalid type");
-        }
+            "i32.clz" => 0x67,
+            "i32.ctz" => 0x068,
+            "i32.popcnt" => 0x69,
+            "i32.add" => 0x6A,
+            "i32.sub" => 0x6B,
+            "i32.mul" => 0x6C,
+            "i32.div_s" => 0x6D,
+            "i32.div_u" => 0x6E,
+            "i32.rem_s" => 0x6F,
+            "i32.rem_u" => 0x70,
+            "i32.and" => 0x71,
+            "i32.or" => 0x72,
+            "i32.xor" => 0x73,
+            "i32.shl" => 0x74,
+            "i32.shr_s" => 0x75,
+            "i32.shr_u" => 0x76,
+            "i32.rotl" => 0x77,
+            "i32.rotr" => 0x78,
+            "i64.clz" => 0x79,
+            "i64.ctz" => 0x7A,
+            "i64.popcnt" => 0x7B,
+            "i64.add" => 0x7C,
+            "i64.sub" => 0x7D,
+            "i64.mul" => 0x7E,
+            "i64.div_s" => 0x7F,
+            "i64.div_u" => 0x80,
+            "i64.rem_s" => 0x81,
+            "i64.rem_u" => 0x82,
+            "i64.and" => 0x83,
+            "i64.or" => 0x84,
+            "i64.xor" => 0x85,
+            "i64.shl" => 0x86,
+            "i64.shr_s" => 0x87,
+            "i64.shr_u" => 0x88,
+            "i64.rotl" => 0x89,
+            "i64.rotr" => 0x8A,
+            "f32.abs" => 0x8B,
+            "f32.neg" => 0x8C,
+            "f32.ceil" => 0x8D,
+            "f32.floor" => 0x8E,
+            "f32.trunc" => 0x8F,
+            "f32.nearest" => 0x90,
+            "f32.sqrt" => 0x91,
+            "f32.add" => 0x92,
+            "f32.sub" => 0x93,
+            "f32.mul" => 0x94,
+            "f32.div" => 0x95,
+            "f32.min" => 0x96,
+            "f32.max" => 0x97,
+            "f32.copysign" => 0x98,
+            "f64.abs" => 0x99,
+            "f64.neg" => 0x9A,
+            "f64.ceil" => 0x9B,
+            "f64.floor" => 0x9C,
+            "f64.trunc" => 0x9D,
+            "f64.nearest" => 0x9E,
+            "f64.sqrt" => 0x9F,
+            "f64.add" => 0xA0,
+            "f64.sub" => 0xA1,
+            "f64.mul" => 0xA2,
+            "f64.div" => 0xA3,
+            "f64.min" => 0xA4,
+            "f64.max" => 0xA5,
+            "f64.copysign" => 0xA6,
+            _ => throw new Exception("Invalid type"),
+        };
     }
     
 

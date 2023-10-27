@@ -25,16 +25,16 @@ external i32 isGreaterThan(i32 left, i32 right)
 	return result		
 }
 
-external i32 subTwoIfPositive(i32 left, i32 right)
-{
-	new i32 result = 0
-	
-	if i32 gt_s left right
-		sub i32 result = left right
-	end
-	
-	return result
-}
+//external i32 subTwoIfPositive(i32 left, i32 right)
+//{
+//	new i32 result = 0
+//	
+//	if i32 gt_s left right
+//		sub i32 result = left right
+//	end
+//	
+//	return result
+//}
 
 external i32 isNegative(i32 val)
 {

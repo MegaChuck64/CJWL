@@ -16,13 +16,15 @@ request.onload = () => {
 
     Test_IsGreaterThan(isGreaterThan);
 
+
+
     const { subTwoIfPositive } = results.instance.exports;
 
     Test_SubTwoIfPositive(subTwoIfPositive);
 
-    // const { isNegative } = results.instance.exports;
+    const { isNegative } = results.instance.exports;
 
-    // Test_IsNegative(isNegative);    
+    Test_IsNegative(isNegative);    
         
     // const { mulIfLessThan } = results.instance.exports;
 
